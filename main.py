@@ -10,6 +10,7 @@ app = FastAPI(
     version="1.0.0"
 )
 
+
 # Root endpoint
 @app.get("/")
 async def health_check():
@@ -53,9 +54,9 @@ async def upload_pdf(file: UploadFile = File(...)):
 
 
   # Return info
-  return PDFUploadResponse(
-    file_meta=PDFMetadata(**metadata),
-    message="PDF processed successfully"
+  return PDFUploadResponse( 
+      file_meta=PDFMetadata(**metadata),
+      message="PDF processed successfully"
   )
 
 
