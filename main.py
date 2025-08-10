@@ -2,6 +2,9 @@ from fastapi import FastAPI, UploadFile, File, HTTPException
 from models import PDFMetadata, PDFUploadResponse
 from services.pdf_service import extract_pdf_metadata
 
+# Constants
+MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
+ALLOWED_CONTENT_TYPES = ["application/pdf"]
 
 # FastAPI app
 app = FastAPI(
@@ -26,10 +29,10 @@ async def health():
 @app.post("/upload")
 async def upload_pdf(file: UploadFile = File(...)):
   # Validate file type
-  if not file.content_type == "application/pdf":
+  if file.content_type not in ALLOWED_CONTENT_TYPES:
       raise HTTPException(
           status_code=400,
-          detail="Only PDF files are allowed"
+          detail=f"Invalid file type. Allowed types: {', '.join(ALLOWED_CONTENT_TYPES)}"
       )
 
   # Validate file extension
@@ -43,10 +46,10 @@ async def upload_pdf(file: UploadFile = File(...)):
   content = await file.read()
   file_size = len(content)
 
-  if file_size > 10 * 1024 * 1024:
+  if file_size > MAX_FILE_SIZE:
       raise HTTPException(
           status_code=400,
-          detail="Maximum 10MB allowed"
+          detail=f"File size exceeds the limit of {MAX_FILE_SIZE / (1024 * 1024)} MB"
       )
   
   # Extract PDF metadata
